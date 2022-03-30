@@ -1,6 +1,7 @@
 package com.infybuzz.service;
 
 import com.infybuzz.entity.Student;
+import com.infybuzz.feignclients.AddressFeignClient;
 import com.infybuzz.repository.StudentRepository;
 import com.infybuzz.request.CreateStudentRequest;
 import com.infybuzz.response.AddressResponse;
@@ -21,6 +22,9 @@ public class StudentService {
 	// also we can use this webclient to call other services as well, just need to create another bean of webclient
 	// and provide url of that service
 
+	@Autowired
+	AddressFeignClient addressFeignClient;
+
 	public StudentResponse createStudent(CreateStudentRequest createStudentRequest) {
 
 		Student student = new Student();
@@ -32,7 +36,8 @@ public class StudentService {
 		student = studentRepository.save(student);
 
 		StudentResponse studentResponse = new StudentResponse(student);
-		studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
+		//studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
+		studentResponse.setAddressResponse(addressFeignClient.getById(student.getAddressId()));
 		return studentResponse;
 	}
 	
@@ -40,8 +45,8 @@ public class StudentService {
 		Student student = studentRepository.findById(id).get();
 		StudentResponse studentResponse = new StudentResponse(student);
 
-		studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
-
+		// studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
+		studentResponse.setAddressResponse(addressFeignClient.getById(student.getAddressId()));
 		return studentResponse;
 	}
 
